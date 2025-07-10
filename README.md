@@ -33,6 +33,16 @@ Edit
 uvicorn main:app --reload
 Run the Bash agent:
 
+## 🐧 Bash Agent
+
+The Bash script `pulsemon-agent.sh` collects CPU, Memory, Disk stats and sends them to your FastAPI backend.
+
+### 🔁 Run it manually:
+
+```bash
+bash pulsemon-agent.sh
+
+
 bash
 Copy
 Edit
