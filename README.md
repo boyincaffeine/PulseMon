@@ -1,77 +1,123 @@
-# PulseMon 🚨
+# ⚡ PulseMon - Server Monitoring Dashboard
 
-PulseMon is a simple server health monitoring tool that tracks CPU, memory, and disk usage — and sends alerts via Slack and Telegram when thresholds are exceeded.
+PulseMon is a full-stack server health monitoring solution that collects, stores, and displays system performance data in real-time — with alerts via Slack and Telegram when thresholds are breached.
 
-## 📦 Features
+![PulseMon Demo](https://cdn-icons-png.flaticon.com/512/1995/1995653.png)
 
-- 📊 Collects system stats (CPU, memory, disk)
-- 📤 Sends alerts to Slack & Telegram
-- 💾 Saves reports to MongoDB Atlas
-- ⚡ REST API built using FastAPI
-- 🐧 Bash script agent for Linux servers
+---
+
+## 🚀 Live Demo
+
+🔗 Frontend: [https://pulsemon-frontend.onrender.com](https://pulsemon-frontend.onrender.com)
+
+---
+
+## 🧠 Features
+
+- 📊 Monitor CPU, Memory, and Disk usage
+- 🔔 Real-time alerts to Slack and Telegram
+- 🔐 User authentication with Supabase
+- 📥 Bash-based Linux agent with cronjob integration
+- 🌐 Deployed on Render (frontend + backend)
+
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend**: React, Vite, Supabase Auth
+- **Backend**: FastAPI, MongoDB
+- **Agent**: Bash script (pulsemon-agent.sh)
+- **Alerts**: Slack Webhooks + Telegram Bot
+- **Deployment**: Render
+
+---
 
 ## 📁 Project Structure
 
 PulseMon/
-├── backend/
-│ ├── main.py
-│ ├── .env.example
-│ ├── requirements.txt
-├── README.md
-
-markdown
-Copy
-Edit
-
-## 🚀 Usage
-
-1. Clone the repo
-2. Set up your `.env` using `.env.example`
-3. Install dependencies and run:
-
-```bash
-uvicorn main:app --reload
-Run the Bash agent:
-
-## 🐧 Bash Agent
-
-The Bash script `pulsemon-agent.sh` collects CPU, Memory, Disk stats and sends them to your FastAPI backend.
-
-### 🔁 Run it manually:
-
-```bash
-bash pulsemon-agent.sh
-
-
-bash
-Copy
-Edit
-bash pulsemon-agent.sh
-🛠️ .env Configuration
-ini
-Copy
-Edit
-MONGO_URI=your_mongo_connection_uri
-SLACK_WEBHOOK=https://hooks.slack.com/services/...
-TELEGRAM_TOKEN=your_telegram_token
-TELEGRAM_CHAT_ID=your_telegram_chat_id
-📬 Contributing
-PRs welcome!
-
-📄 License
-MIT
+├── backend/ # FastAPI backend
+│ ├── main.py # API endpoints and alert logic
+│ └── .env # Environment secrets (Mongo URI, Webhooks)
+├── pulsemon-frontend/ # React + Vite frontend
+│ ├── src/
+│ │ ├── components/
+│ │ │ ├── Navbar.jsx
+│ │ │ └── ProtectedRoute.jsx
+│ │ ├── pages/
+│ │ │ ├── Login.jsx
+│ │ │ ├── Dashboard.jsx
+│ │ │ └── LandingPage.jsx
+│ │ ├── App.jsx
+│ │ ├── main.jsx
+│ │ └── supabaseClient.js
+│ ├── public/
+│ └── vite.config.js
+├── pulsemon-agent.sh # Bash script to send server metrics
+└── README.md
 
 yaml
 Copy
 Edit
 
-Then press `Ctrl + O`, `Enter` to save, and `Ctrl + X` to exit.
+---
+
+## 🐧 Linux Agent Setup
+
+```bash
+chmod +x pulsemon-agent.sh
+crontab -e
+# Add the following line to send metrics every 5 minutes
+*/5 * * * * /bin/bash /home/vboxuser/PulseMon/pulsemon-agent.sh
+🧪 How it Works
+📡 Agent script collects system metrics (CPU, MEM, DISK, IP)
+
+🔁 Sends report to FastAPI /api/report
+
+🚨 If thresholds exceeded → alerts sent to Slack & Telegram
+
+🧾 Dashboard (React) fetches /api/reports and displays them
+
+🔐 Supabase handles user login and protects access
+
+🧾 Environment Variables (.env)
+env
+Copy
+Edit
+MONGO_URI=mongodb+srv://...
+SLACK_WEBHOOK=https://hooks.slack.com/services/...
+TELEGRAM_TOKEN=your_bot_token
+TELEGRAM_CHAT_ID=your_chat_id
+📸 Screenshots
+🖥️ Dashboard
+
+
+🔐 Login
+
+
+💡 Future Enhancements
+Historical charts (CPU/MEM usage over time)
+
+Admin panel for user/device management
+
+Email alert integration
+
+Dockerized deployment
+
+📜 License
+This project is licensed under the MIT License.
+
+🤝 Contributions Welcome!
+If you find this useful, feel free to ⭐ the repo and contribute!
+
+yaml
+Copy
+Edit
 
 ---
 
-### ✅ 3. Add it to Git and push
+Let me know if you want me to:
+- Add badges (deployment, license, tech stack)
+- Auto-generate images for your screenshots
+- Help publish on ProductHunt, GitHub Discussions, or Dev.to
 
-```bash
-git add README.md
-git commit -m "📝 Add README.md with project overview"
-git push
+Ready for next steps whenever you are!
