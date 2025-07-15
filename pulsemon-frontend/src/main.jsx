@@ -1,25 +1,29 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import App from "./App";
-import LandingPage from "./pages/LandingPage";
-import Dashboard from "./pages/Dashboard";
-import ProtectedRoute from "./components/ProtectedRoute";
+import Login from "./pages/Login.jsx";
+import LandingPage from "./pages/LandingPage.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <Router>
+  <BrowserRouter>
     <Routes>
       <Route path="/" element={<LandingPage />} />
-      <Route path="/login" element={<App />} />
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        }
-      />
+      <Route path="/login" element={<Login />} />
+      <Route path="/app" element={<App />}>
+        <Route
+          path="/app/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+      </Route>
     </Routes>
-  </Router>
+  </BrowserRouter>
 );
 

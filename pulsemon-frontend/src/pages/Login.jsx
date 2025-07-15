@@ -1,6 +1,6 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { supabase } from "../supabaseClient";
 import { useNavigate } from "react-router-dom";
-import supabase from "../supabaseClient";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -13,27 +13,31 @@ function Login() {
       email,
       password,
     });
-    if (error) return alert("❌ " + error.message);
-    navigate("/dashboard");
+
+    if (error) {
+      alert("❌ Invalid credentials");
+    } else {
+      navigate("/app/dashboard");
+    }
   };
 
   return (
-    <div style={{ padding: "2rem" }}>
+    <div style={{ padding: "2rem", textAlign: "center" }}>
       <h2>🔐 Login to PulseMon</h2>
-      <form onSubmit={handleLogin}>
+      <form onSubmit={handleLogin} style={{ marginTop: "1rem" }}>
         <input
           type="email"
           placeholder="Email"
           value={email}
-          required
           onChange={(e) => setEmail(e.target.value)}
+          required
         /><br /><br />
         <input
           type="password"
           placeholder="Password"
           value={password}
-          required
           onChange={(e) => setPassword(e.target.value)}
+          required
         /><br /><br />
         <button type="submit">Login</button>
       </form>

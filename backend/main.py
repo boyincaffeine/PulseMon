@@ -8,13 +8,15 @@ from bson.json_util import dumps
 import os
 import requests
 
+# ✅ Load environment variables
 load_dotenv()
+
 app = FastAPI()
 
-# ✅ CORS configured strictly for your frontend
+# ✅ Allow all origins for development (🔒 restrict in production)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://pulsemon-frontend.onrender.com"],
+    allow_origins=["https://pulsemon-frontend.onrender.com"],  # ✅ Use your actual frontend render URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -30,6 +32,7 @@ TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
 
+# ✅ Slack alert
 def send_slack(message: str):
     if SLACK_WEBHOOK:
         payload = {"text": message}
@@ -37,6 +40,7 @@ def send_slack(message: str):
         print("Slack:", response.status_code, response.text)
 
 
+# ✅ Telegram alert
 def send_telegram(message: str):
     if TELEGRAM_TOKEN and TELEGRAM_CHAT_ID:
         url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
@@ -45,13 +49,13 @@ def send_telegram(message: str):
         print("Telegram:", response.status_code, response.text)
 
 
-# ✅ Health check endpoint
+# ✅ Health check route
 @app.get("/")
 async def root():
     return {"status": "ok", "message": "PulseMon backend is live 🚀"}
 
 
-# ✅ POST API to receive metrics
+# ✅ Endpoint to receive and store reports
 @app.post("/api/report")
 async def report(req: Request):
     data = await req.json()
@@ -63,6 +67,7 @@ async def report(req: Request):
     disk = data.get("disk", 0)
     ip = data.get("ip", "unknown")
 
+    # ✅ Trigger alerts
     if cpu > 80 or mem > 85:
         msg = (
             f"🚨 ALERT\n"
@@ -78,11 +83,11 @@ async def report(req: Request):
     return {"status": "received"}
 
 
-# ✅ GET API to fetch latest 10 reports
+# ✅ Endpoint to fetch latest 10 reports
 @app.get("/api/reports")
 async def get_reports():
     reports = list(db.reports.find().sort("timestamp", -1).limit(10))
     for r in reports:
-        r["_id"] = str(r["_id"])  # Convert ObjectId to string for JSON compatibility
+        r["_id"] = str(r["_id"])  # Convert ObjectId for JSON compatibility
     return JSONResponse(content=reports)
 
