@@ -1,73 +1,41 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { supabase } from "./supabaseClient";
 
 function App() {
-  const [reports, setReports] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
 
-  const sendReport = async () => {
-    try {
-      const res = await axios.post("https://pulsemon.onrender.com/api/report", {
-        cpu: 91,
-        mem: 90,
-        disk: 80,
-        ip: "127.0.0.1"
-      });
-      alert("✅ Report sent!");
-      fetchReports(); // Refresh reports
-    } catch (error) {
-      console.error("❌ Error:", error);
-      alert("❌ Failed to send report");
-    }
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) setErrorMsg(error.message);
+    else window.location.href = "/dashboard";
   };
-
-  const fetchReports = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get("https://pulsemon.onrender.com/api/reports");
-      setReports(res.data);
-    } catch (err) {
-      console.error("Failed to fetch reports:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchReports();
-  }, []);
 
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial" }}>
-      <h1>📊 PulseMon Dashboard</h1>
-      <button onClick={sendReport}>🚀 Send Test Report</button>
-      <hr />
-      {loading ? (
-        <p>Loading reports...</p>
-      ) : (
-        <table border="1" cellPadding="10">
-          <thead>
-            <tr>
-              <th>Time</th>
-              <th>IP</th>
-              <th>CPU %</th>
-              <th>MEM %</th>
-              <th>DISK %</th>
-            </tr>
-          </thead>
-          <tbody>
-            {reports.map((r) => (
-              <tr key={r._id}>
-                <td>{new Date(r.timestamp).toLocaleString()}</td>
-                <td>{r.ip}</td>
-                <td>{r.cpu}</td>
-                <td>{r.mem}</td>
-                <td>{r.disk}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+    <div style={{ padding: "2rem", textAlign: "center" }}>
+      <h2>🔐 Login to PulseMon</h2>
+      <form onSubmit={handleLogin}>
+        <input
+          type="email"
+          placeholder="Email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          style={{ marginBottom: "10px" }}
+        /><br />
+        <input
+          type="password"
+          placeholder="Password"
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          style={{ marginBottom: "10px" }}
+        /><br />
+        <button type="submit">Login</button>
+        {errorMsg && <p style={{ color: "red" }}>{errorMsg}</p>}
+      </form>
     </div>
   );
 }
