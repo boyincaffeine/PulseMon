@@ -1,18 +1,20 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from datetime import datetime
 from dotenv import load_dotenv
 from pymongo import MongoClient
+from bson.json_util import dumps
 import os
 import requests
 
 load_dotenv()
 app = FastAPI()
 
-# ✅ CORS FIX: Allow frontend to call backend
+# ✅ CORS for frontend communication
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Or specify exact domains like ["http://localhost:5173", "https://pulsemon-frontend.onrender.com"]
+    allow_origins=["*"],  # Or restrict to specific domain
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -34,10 +36,7 @@ def send_slack(message: str):
 def send_telegram(message: str):
     if TELEGRAM_TOKEN and TELEGRAM_CHAT_ID:
         url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
-        payload = {
-            "chat_id": TELEGRAM_CHAT_ID,
-            "text": message
-        }
+        payload = {"chat_id": TELEGRAM_CHAT_ID, "text": message}
         response = requests.post(url, data=payload)
         print("Telegram:", response.status_code, response.text)
 
@@ -65,4 +64,11 @@ async def report(req: Request):
         send_telegram(msg)
 
     return {"status": "received"}
+
+@app.get("/api/reports")
+async def get_reports():
+    reports = list(db.reports.find().sort("timestamp", -1).limit(10))
+    for r in reports:
+        r["_id"] = str(r["_id"])
+    return JSONResponse(content=reports)
 

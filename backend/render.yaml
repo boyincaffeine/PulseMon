@@ -7,11 +7,11 @@ services:
     plan: free
     envVars:
       - key: MONGO_URI
-        value: your_mongo_uri
+        sync: false
       - key: SLACK_WEBHOOK
-        value: your_slack_webhook
+        sync: false
       - key: TELEGRAM_TOKEN
-        value: your_bot_token
+        sync: false
       - key: TELEGRAM_CHAT_ID
-        value: your_telegram_chat_id
+        sync: false
 
