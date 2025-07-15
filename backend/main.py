@@ -11,27 +11,31 @@ import requests
 load_dotenv()
 app = FastAPI()
 
-# ✅ CORS for frontend communication
+# ✅ CORS configured strictly for your frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Or restrict to specific domain
+    allow_origins=["https://pulsemon-frontend.onrender.com"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# ✅ MongoDB setup
 client = MongoClient(os.getenv("MONGO_URI"))
 db = client["pulsemon"]
 
+# ✅ Notification configs
 SLACK_WEBHOOK = os.getenv("SLACK_WEBHOOK")
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+
 
 def send_slack(message: str):
     if SLACK_WEBHOOK:
         payload = {"text": message}
         response = requests.post(SLACK_WEBHOOK, json=payload)
         print("Slack:", response.status_code, response.text)
+
 
 def send_telegram(message: str):
     if TELEGRAM_TOKEN and TELEGRAM_CHAT_ID:
@@ -40,6 +44,14 @@ def send_telegram(message: str):
         response = requests.post(url, data=payload)
         print("Telegram:", response.status_code, response.text)
 
+
+# ✅ Health check endpoint
+@app.get("/")
+async def root():
+    return {"status": "ok", "message": "PulseMon backend is live 🚀"}
+
+
+# ✅ POST API to receive metrics
 @app.post("/api/report")
 async def report(req: Request):
     data = await req.json()
@@ -65,10 +77,12 @@ async def report(req: Request):
 
     return {"status": "received"}
 
+
+# ✅ GET API to fetch latest 10 reports
 @app.get("/api/reports")
 async def get_reports():
     reports = list(db.reports.find().sort("timestamp", -1).limit(10))
     for r in reports:
-        r["_id"] = str(r["_id"])
+        r["_id"] = str(r["_id"])  # Convert ObjectId to string for JSON compatibility
     return JSONResponse(content=reports)
 
